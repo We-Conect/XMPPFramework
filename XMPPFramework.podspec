@@ -1,137 +1,59 @@
-#
-#  Be sure to run `pod spec lint XMPPFramework.podspec' to ensure this is a
-#  valid spec and to remove all comments including this before submitting the spec.
-#
-#  To learn more about Podspec attributes see http://docs.cocoapods.org/specification.html
-#  To see working Podspecs in the CocoaPods repo see https://github.com/CocoaPods/Specs/
-#
-
 Pod::Spec.new do |s|
-
-  # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  These will help people to find your library, and whilst it
-  #  can feel like a chore to fill in it's definitely to your advantage. The
-  #  summary should be tweet-length, and the description more in depth.
-  #
-
   s.name         = "XMPPFramework"
   s.version      = "3.6.5"
   s.summary      = "An XMPP Framework in Objective-C for Mac and iOS"
-
-  # This description is used to generate tags and improve search results.
-  #   * Think: What does it do? Why did you write it? What is the focus?
-  #   * Try to keep it short, snappy and to the point.
-  #   * Write the description between the DESC delimiters below.
-  #   * Finally, don't worry about the indent, CocoaPods strips it!
-  s.description  = <<-DESC
-                   DESC
-
   s.homepage     = "https://github.com/We-Conect/XMPPFramework"
-  # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
-
-
-  # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Licensing your code is important. See http://choosealicense.com for more info.
-  #  CocoaPods will detect a license file if there is a named LICENSE*
-  #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
-  #
-
   s.license      = "MIT (example)"
-  # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
-
-
-  # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Specify the authors of the library, with email addresses. Email addresses
-  #  of the authors are extracted from the SCM log. E.g. $ git log. CocoaPods also
-  #  accepts just a name if you'd rather not provide an email address.
-  #
-  #  Specify a social_media_url where others can refer to, for example a twitter
-  #  profile URL.
-  #
-
   s.author             = { "we.CONECT Global Leaders GmbH" => "marc.jeanson@we-conect.com" }
-  # Or just: s.author    = "we.CONECT Global Leaders GmbH"
-  # s.authors            = { "we.CONECT Global Leaders GmbH" => "email@address.com" }
-  # s.social_media_url   = "http://twitter.com/we.CONECT Global Leaders GmbH"
-
-  # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  If this Pod runs only on iOS or OS X, then specify the platform and
-  #  the deployment target. You can optionally include the target after the platform.
-  #
-
   s.platform     = :ios
   s.platform     = :ios, "6.0"
 
-  #  When using multiple platforms
-  # s.ios.deployment_target = "5.0"
-  # s.osx.deployment_target = "10.7"
-  # s.watchos.deployment_target = "2.0"
-  # s.tvos.deployment_target = "9.0"
-
-
-  # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Specify the location from where the source should be retrieved.
-  #  Supports git, hg, bzr, svn and HTTP.
-  #
-
   s.source       = { :git => "https://github.com/We-Conect/XMPPFramework.git", :branch => "patch-ipv6" }
+  s.resources = [ '**/*.{xcdatamodel,xcdatamodeld}']
+
+  s.description = 'XMPPFramework provides a core implementation of RFC-3920 (the xmpp standard), along with
+  the tools needed to read & write XML. It comes with multiple popular extensions (XEPs),
+  all built atop a modular architecture, allowing you to plug-in any code needed for the job.
+  Additionally the framework is massively parallel and thread-safe. Structured using GCD,
+  this framework performs    well regardless of whether it\'s being run on an old iPhone, or
+  on a 12-core Mac Pro. (And it won\'t block the main thread... at all).'
+
+  s.osx.deployment_target = '10.8'
+  s.ios.deployment_target = '7.0'
 
 
-  # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  CocoaPods is smart about how it includes source code. For source files
-  #  giving a folder will include any swift, h, m, mm, c & cpp files.
-  #  For header files it will include any header in the folder.
-  #  Not including the public_header_files will make all headers public.
-  #
+  s.requires_arc = true
+  s.default_subspec = "All"
+
+  # XMPPFramework.h is used internally in the framework to let modules know
+  # what other optional modules are available. Since we don't know yet which
+  # subspecs have been selected, include all of them wrapped in defines which
+  # will be set by the relevant subspecs.
+
+  s.prepare_command = <<-'END'
+  echo '#import "XMPP.h"' > XMPPFramework.h
+  grep '#define _XMPP_' -r /Extensions \
+  | tr '-' '_' \
+  | perl -pe 's/Extensions\/([A-z0-9_]*)\/([A-z]*.h).*/\n#ifdef HAVE_XMPP_SUBSPEC_\U\1\n\E#import "\2"\n#endif/' \
+  >> XMPPFramework.h
+  END
+
+  s.subspec 'Core' do |core|
+    core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
+    core.vendored_libraries = 'Vendor/libidn/libidn.a'
+    core.libraries = 'xml2', 'resolv'
+    core.xcconfig = {
+      'HEADER_SEARCH_PATHS' => '$(inherited) $(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv',
+      'LIBRARY_SEARCH_PATHS' => '$(PODS_ROOT)/XMPPFramework/Vendor/libidn',
+      'ENABLE_BITCODE' => 'NO'
+    }
+    core.dependency 'CocoaLumberjack', '~> 1.9'
+    core.dependency 'CocoaAsyncSocket', '~> 7.4.1'
+  end
+
 
   s.source_files  = "Classes", "Classes/**/*.{h,m}"
   s.exclude_files = "Classes/Exclude"
 
-  # s.public_header_files = "Classes/**/*.h"
-
-
-  # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  A list of resources included with the Pod. These are copied into the
-  #  target bundle with a build phase script. Anything else will be cleaned.
-  #  You can preserve files from being cleaned, please don't preserve
-  #  non-essential files like tests, examples and documentation.
-  #
-
-  # s.resource  = "icon.png"
-  # s.resources = "Resources/*.png"
-
-  # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
-
-
-  # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Link your library with frameworks, or libraries. Libraries do not include
-  #  the lib prefix of their name.
-  #
-
-  # s.framework  = "SomeFramework"
   s.frameworks = "UIKit", "Foundation"
-
-  # s.library   = "iconv"
-  # s.libraries = "iconv", "xml2"
-
-
-  # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  If your library depends on compiler flags you can set them in the xcconfig hash
-  #  where they will only apply to your library. If you depend on other Podspecs
-  #  you can include multiple dependencies to ensure it works.
-
-  # s.requires_arc = true
-
-  # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  # s.dependency "JSONKit", "~> 1.4"
-
 end
