@@ -92,7 +92,7 @@ Pod::Spec.new do |s|
     ss.dependency 'XMPPFramework/XEP-0297'
     ss.dependency 'XMPPFramework/XEP-0308'
     ss.dependency 'XMPPFramework/XEP-0333'
-    ss.dependency 'XMPPFramework/XEP-0335'
+    # ss.dependency 'XMPPFramework/XEP-0335'
   end
 
   s.source_files  = "Classes", "Classes/**/*.{h,m}"
