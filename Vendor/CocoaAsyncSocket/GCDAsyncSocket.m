@@ -2279,7 +2279,7 @@ enum GCDAsyncSocketConfig
 
     // Hack if ipv6 doesn't connect, try ipv4
     // https://github.com/robbiehanson/XMPPFramework/issues/718#issuecomment-271255592
-    if (result == 0) {
+    if (result != 0) {
       socket6FD = SOCKET_NULL;
       socket4FD = socket(AF_INET, SOCK_STREAM, 0);
 
