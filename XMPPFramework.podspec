@@ -49,6 +49,27 @@ Pod::Spec.new do |s|
     }
     core.dependency 'CocoaLumberjack', '~> 1.9'
     core.dependency 'CocoaAsyncSocket', '~> 7.4.1'
+    core.ios.dependency 'XMPPFramework/KissXML'
+  end
+
+  s.subspec 'Authentication' do |ss|
+    ss.source_files =  'Authentication/**/*.{h,m}'
+    ss.dependency 'XMPPFramework/Core'
+  end
+
+  s.subspec 'Categories' do |ss|
+    ss.source_files =  'Categories/**/*.{h,m}'
+    ss.dependency 'XMPPFramework/Core'
+  end
+
+  s.subspec 'Utilities' do |ss|
+    ss.source_files =  'Utilities/**/*.{h,m}'
+    ss.dependency 'XMPPFramework/Core'
+  end
+
+  s.subspec 'KissXML' do |ss|
+    ss.source_files = 'Vendor/KissXML/**/*.{h,m}'
+    ss.dependency 'XMPPFramework/Core'
   end
 
   s.subspec 'BandwidthMonitor' do |ss|
