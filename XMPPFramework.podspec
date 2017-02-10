@@ -49,7 +49,6 @@ Pod::Spec.new do |s|
     }
     core.dependency 'CocoaLumberjack', '~> 1.9'
     core.dependency 'CocoaAsyncSocket', '~> 7.4.1'
-    core.ios.dependency 'XMPPFramework/KissXML'
   end
 
   s.subspec 'Authentication' do |ss|
