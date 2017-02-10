@@ -60,7 +60,6 @@ Pod::Spec.new do |s|
     ss.dependency 'XMPPFramework/ProcessOne'
     ss.dependency 'XMPPFramework/Reconnect'
     ss.dependency 'XMPPFramework/Roster'
-    ss.osx.dependency 'XMPPFramework/SystemInputActivityMonitor'
     ss.dependency 'XMPPFramework/XEP-0009'
     ss.dependency 'XMPPFramework/XEP-0012'
     ss.dependency 'XMPPFramework/XEP-0016'
