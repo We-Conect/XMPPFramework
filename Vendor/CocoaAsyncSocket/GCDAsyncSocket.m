@@ -2227,10 +2227,23 @@ enum GCDAsyncSocketConfig
 
 	if (socketFD == SOCKET_NULL)
 	{
-		if (errPtr)
-			*errPtr = [self errnoErrorWithReason:@"Error in socket() function"];
 
-		return NO;
+    // MORE HACK CODE! fall back to ipv4 and try again!
+		LogVerbose(@"Creating IPv4 socket");
+
+		socket4FD = socket(AF_INET, SOCK_STREAM, 0);
+
+		socketFD = socket4FD;
+		address = address4;
+		connectInterface = connectInterface4;
+
+    if (socketFD == SOCKET_NULL)
+      {
+        if (errPtr)
+          *errPtr = [self errnoErrorWithReason:@"Error in socket() function"];
+
+        return NO;
+      }
 	}
 
 	// Bind the socket to the desired interface (if needed)
