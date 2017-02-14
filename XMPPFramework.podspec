@@ -367,7 +367,5 @@ Pod::Spec.new do |s|
     ss.dependency 'XMPPFramework/XEP-0335'
   end
 
-  s.source_files = ['XMPPFramework.h']
-
   s.frameworks = "UIKit", "Foundation"
 end
